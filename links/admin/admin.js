@@ -45,6 +45,23 @@ function saveOrders(orders) {
   localStorage.setItem(STORAGE_KEYS.orders, JSON.stringify(orders));
 }
 
+function listenRemoteOrders() {
+  const ordersRef = ref(db, 'orders');
+  onValue(ordersRef, snapshot => {
+    const data = snapshot.val();
+    const ordersArray = data
+      ? Object.entries(data).map(([id, order]) => ({ id, ...order }))
+      : [];
+    currentOrders = ordersArray.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    saveOrders(currentOrders);
+    renderDashboard();
+  }, error => {
+    console.error('Firebase order read failed:', error);
+    currentOrders = getStoredOrders();
+    renderDashboard();
+  });
+}
+
 const authMessage = document.getElementById('authMessage');
 const ordersContainer = document.getElementById('orders');
 const productForm = document.getElementById('productForm');
@@ -99,6 +116,7 @@ function loginAdmin(event) {
   if (isValid) {
     localStorage.setItem(STORAGE_KEYS.loggedIn, 'true');
     toggleAdmin(true);
+    listenRemoteOrders();
     renderDashboard();
     showMessage('تم تسجيل الدخول بنجاح');
   } else {
@@ -205,7 +223,9 @@ function renderProducts() {
 }
 
 function renderDashboard() {
-  currentOrders = getStoredOrders();
+  if (!currentOrders.length) {
+    currentOrders = getStoredOrders();
+  }
   renderStats();
   renderChart();
   renderOrders();
@@ -346,6 +366,7 @@ function closeModal() { if (productModal) productModal.classList.remove('show');
 
 if (localStorage.getItem(STORAGE_KEYS.loggedIn) === 'true') {
   toggleAdmin(true);
+  listenRemoteOrders();
   renderDashboard();
 } else {
   toggleAdmin(false);

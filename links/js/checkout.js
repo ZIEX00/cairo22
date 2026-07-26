@@ -68,7 +68,16 @@ window.submitOrder = function submitOrder() {
   orders.unshift(order);
   localStorage.setItem('cairo22_orders', JSON.stringify(orders));
 
-  status.innerHTML = `تم إرسال الطلب بنجاح<br><strong>مرجع الطلب:</strong> ${order.orderRef}<br><span>يمكنك تتبع الطلب لاحقًا باستخدام رقم الهاتف أو المرجع.</span>`;
+  const ordersRef = ref(db, 'orders');
+  const newOrderRef = push(ordersRef);
+  set(newOrderRef, order)
+    .then(() => {
+      status.innerHTML = `تم إرسال الطلب بنجاح<br><strong>مرجع الطلب:</strong> ${order.orderRef}<br><span>يمكنك تتبع الطلب لاحقًا باستخدام رقم الهاتف أو المرجع.</span>`;
+    })
+    .catch(error => {
+      console.error('Firebase save order failed:', error);
+      status.innerHTML = `حدث خطأ أثناء إرسال الطلب، لكنه حفظ محليًا. حاول مرة أخرى لاحقًا.`;
+    });
 
   const notification = `تم استلام طلبك بنجاح. مرجع الطلب: ${order.orderRef}. الحالة الحالية: جديد.`;
   if (phone) {
