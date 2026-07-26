@@ -1,4 +1,4 @@
-import { db } from "../js/firebase-config.js";
+import { db } from "./js/firebase-config.js";
 import { ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
 const defaultAdminEmail = 'admin@cairo22.com';
