@@ -1,0 +1,118 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', 'Segoe UI', Tahoma, sans-serif;
+  background: #fff7ed;
+  color: #2f241d;
+}
+
+header {
+  text-align: center;
+  padding: 22px 20px;
+  background: #111;
+  color: #c89b57;
+}
+
+.nav-links {
+  margin-top: 10px;
+}
+
+.nav-links a {
+  color: #c89b57;
+  text-decoration: none;
+  margin: 0 15px;
+  font-weight: 700;
+}
+
+.hero-contact {
+  text-align: center;
+  padding: 40px 20px 10px;
+}
+
+.hero-contact h2 {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.hero-contact p {
+  color: #6b5b4f;
+}
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease-out;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cards.contact {
+  padding: 30px 20px 60px;
+  text-align: center;
+}
+
+.cards.contact .content {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.cards.contact .card {
+  background: #111;
+  color: #fff;
+  border-radius: 20px;
+  padding: 28px 20px;
+  width: 260px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.16);
+}
+
+.cards.contact .card .icon {
+  color: #c89b57;
+  margin-bottom: 16px;
+}
+
+.cards.contact .card .info h3 {
+  color: #c89b57;
+  margin-bottom: 6px;
+}
+
+.cards.contact .card .btn a {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #c89b57, #8c5f1d);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .cards.contact .content {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 500px) {
+  header {
+    padding: 18px 14px;
+  }
+
+  .hero-contact {
+    padding: 30px 14px 10px;
+  }
+
+  .cards.contact .card {
+    width: 100%;
+  }
+}
