@@ -1,5 +1,6 @@
-import { db } from "./js/firebase-config.js";
+import { db, auth } from "./js/firebase-config.js";
 import { ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+import { signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
 const defaultAdminEmail = 'admin@cairo22.com';
 const defaultAdminPassword = 'cairo22admin';
@@ -43,6 +44,16 @@ function getStoredOrders() {
 
 function saveOrders(orders) {
   localStorage.setItem(STORAGE_KEYS.orders, JSON.stringify(orders));
+}
+
+function ensureAdminAuth() {
+  if (auth.currentUser) {
+    return Promise.resolve(auth.currentUser);
+  }
+  return signInAnonymously(auth).catch(error => {
+    console.error('Firebase admin auth failed:', error);
+    return null;
+  });
 }
 
 function listenRemoteOrders() {
@@ -107,7 +118,7 @@ function toggleAdmin(isLoggedIn) {
   if (adminBox) adminBox.style.display = isLoggedIn ? 'block' : 'none';
 }
 
-function loginAdmin(event) {
+async function loginAdmin(event) {
   event.preventDefault();
   const email = document.getElementById('email').value.trim().toLowerCase();
   const password = document.getElementById('password').value;
@@ -116,6 +127,7 @@ function loginAdmin(event) {
   if (isValid) {
     localStorage.setItem(STORAGE_KEYS.loggedIn, 'true');
     toggleAdmin(true);
+    await ensureAdminAuth();
     listenRemoteOrders();
     renderDashboard();
     showMessage('تم تسجيل الدخول بنجاح');
@@ -366,7 +378,7 @@ function closeModal() { if (productModal) productModal.classList.remove('show');
 
 if (localStorage.getItem(STORAGE_KEYS.loggedIn) === 'true') {
   toggleAdmin(true);
-  listenRemoteOrders();
+  ensureAdminAuth().then(() => listenRemoteOrders());
   renderDashboard();
 } else {
   toggleAdmin(false);

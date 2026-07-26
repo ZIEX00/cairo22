@@ -1,5 +1,6 @@
-import { db } from "./firebase-config.js";
+import { db, auth } from "./firebase-config.js";
 import { ref, push, set } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+import { signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 const buyNowItem = JSON.parse(localStorage.getItem('buyNow') || 'null');
@@ -31,7 +32,7 @@ totals.innerHTML = `
   <strong>النهائي: ${finalTotal} EGP</strong>
 `;
 
-window.submitOrder = function submitOrder() {
+window.submitOrder = async function submitOrder() {
   const name = document.getElementById('name').value.trim();
   const phone = document.getElementById('phone').value.trim();
   const email = document.getElementById('email').value.trim();
@@ -68,16 +69,21 @@ window.submitOrder = function submitOrder() {
   orders.unshift(order);
   localStorage.setItem('cairo22_orders', JSON.stringify(orders));
 
-  const ordersRef = ref(db, 'orders');
-  const newOrderRef = push(ordersRef);
-  set(newOrderRef, order)
-    .then(() => {
-      status.innerHTML = `تم إرسال الطلب بنجاح<br><strong>مرجع الطلب:</strong> ${order.orderRef}<br><span>يمكنك تتبع الطلب لاحقًا باستخدام رقم الهاتف أو المرجع.</span>`;
-    })
-    .catch(error => {
-      console.error('Firebase save order failed:', error);
-      status.innerHTML = `حدث خطأ أثناء إرسال الطلب، لكنه حفظ محليًا. حاول مرة أخرى لاحقًا.`;
-    });
+  try {
+    if (!auth.currentUser) {
+      await signInAnonymously(auth);
+    }
+
+    const ordersRef = ref(db, 'orders');
+    const newOrderRef = push(ordersRef);
+    await set(newOrderRef, order);
+
+    status.innerHTML = `تم إرسال الطلب بنجاح<br><strong>مرجع الطلب:</strong> ${order.orderRef}<br><span>يمكنك تتبع الطلب لاحقًا باستخدام رقم الهاتف أو المرجع.</span>`;
+  } catch (error) {
+    console.error('Firebase save order failed:', error);
+    status.innerHTML = `حدث خطأ أثناء إرسال الطلب، لكنه حفظ محليًا. حاول مرة أخرى لاحقًا.`;
+    return;
+  }
 
   const notification = `تم استلام طلبك بنجاح. مرجع الطلب: ${order.orderRef}. الحالة الحالية: جديد.`;
   if (phone) {
