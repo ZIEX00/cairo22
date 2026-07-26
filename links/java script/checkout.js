@@ -1,3 +1,6 @@
+import { db } from "./firebase-config.js";
+import { ref, push, set } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 const buyNowItem = JSON.parse(localStorage.getItem('buyNow') || 'null');
 if (buyNowItem && (!cart.length || cart[0]?.name !== buyNowItem.name)) {

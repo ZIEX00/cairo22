@@ -1,3 +1,6 @@
+import { db } from "./firebase-config.js";
+import { ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
 const defaultAdminEmail = 'admin@cairo22.com';
 const defaultAdminPassword = 'cairo22admin';
 const STORAGE_KEYS = {
@@ -148,7 +151,7 @@ function renderOrders() {
     return;
   }
 
-  filtered.forEach((data, index) => {
+  filtered.forEach((data) => {
     const status = data.status || 'جديد';
     const statusClass = status === 'مكتمل' ? 'done' : status === 'ملغي' ? 'cancel' : 'pending';
     const row = document.createElement('tr');
@@ -156,17 +159,17 @@ function renderOrders() {
       <td>${data.name || '—'}<br><small class="muted">${data.phone || '—'}</small></td>
       <td>${data.orderRef || '—'}</td>
       <td><span class="pill ${statusClass}">${status}</span></td>
-      <td><button class="admin-btn secondary" data-action="show-products" data-index="${index}" style="width:100%;">عرض المنتجات</button></td>
+      <td><button class="admin-btn secondary" data-action="show-products" data-id="${data.id || ''}" style="width:100%;">عرض المنتجات</button></td>
       <td>
-        <select data-index="${index}">
+        <select data-id="${data.id || ''}">
           <option value="جديد" ${status === 'جديد' ? 'selected' : ''}>جديد</option>
           <option value="قيد التنفيذ" ${status === 'قيد التنفيذ' ? 'selected' : ''}>قيد التنفيذ</option>
           <option value="مكتمل" ${status === 'مكتمل' ? 'selected' : ''}>مكتمل</option>
           <option value="ملغي" ${status === 'ملغي' ? 'selected' : ''}>ملغي</option>
         </select>
-        <button class="admin-btn success" data-action="save" data-index="${index}" style="margin-top:6px;">حفظ</button>
-        <button class="admin-btn secondary" data-action="invoice" data-index="${index}" style="margin-top:6px;">فاتورة</button>
-        <button class="admin-btn danger" data-action="delete" data-index="${index}" style="margin-top:6px;">حذف</button>
+        <button class="admin-btn success" data-action="save" data-id="${data.id || ''}" style="margin-top:6px;">حفظ</button>
+        <button class="admin-btn secondary" data-action="invoice" data-id="${data.id || ''}" style="margin-top:6px;">فاتورة</button>
+        <button class="admin-btn danger" data-action="delete" data-id="${data.id || ''}" style="margin-top:6px;">حذف</button>
       </td>
     `;
     ordersContainer.appendChild(row);
@@ -209,24 +212,29 @@ function renderDashboard() {
   renderProducts();
 }
 
-function saveOrderStatus(index, status) {
-  const orders = getStoredOrders();
-  if (!orders[index]) return;
-  orders[index].status = status;
-  saveOrders(orders);
-  currentOrders = orders;
-  statusMessage.textContent = 'تم تحديث الحالة بنجاح';
-  renderDashboard();
+function saveOrderStatus(orderId, statusValue) {
+  if (!orderId) return;
+  update(ref(db, `orders/${orderId}`), { status: statusValue })
+    .then(() => {
+      if (statusMessage) statusMessage.textContent = 'تم تحديث الحالة بنجاح';
+    })
+    .catch(error => {
+      console.error('Order status update failed:', error);
+      if (statusMessage) statusMessage.textContent = 'فشل تحديث الحالة، حاول مرة أخرى';
+    });
 }
 
-function deleteOrder(index) {
+function deleteOrder(orderId) {
+  if (!orderId) return;
   if (!confirm('هل تريد حذف هذا الطلب؟')) return;
-  const orders = getStoredOrders();
-  orders.splice(index, 1);
-  saveOrders(orders);
-  currentOrders = orders;
-  statusMessage.textContent = 'تم حذف الطلب';
-  renderDashboard();
+  remove(ref(db, `orders/${orderId}`))
+    .then(() => {
+      if (statusMessage) statusMessage.textContent = 'تم حذف الطلب';
+    })
+    .catch(error => {
+      console.error('Order delete failed:', error);
+      if (statusMessage) statusMessage.textContent = 'فشل حذف الطلب، حاول مرة أخرى';
+    });
 }
 
 function buildPageUrl(pageName) {
@@ -375,16 +383,16 @@ if (productsList) productsList.addEventListener('click', (event) => {
 ordersContainer?.addEventListener('click', (event) => {
   const target = event.target;
   if (!target.matches('button')) return;
-  const index = target.getAttribute('data-index');
+  const id = target.getAttribute('data-id');
   const action = target.getAttribute('data-action');
-  const order = currentOrders[index];
+  const order = currentOrders.find(order => order.id === id);
   if (!order) return;
 
   if (action === 'save') {
-    const select = ordersContainer.querySelector(`select[data-index="${index}"]`);
-    saveOrderStatus(index, select.value);
+    const select = ordersContainer.querySelector(`select[data-id="${id}"]`);
+    if (select) saveOrderStatus(id, select.value);
   } else if (action === 'delete') {
-    deleteOrder(index);
+    deleteOrder(id);
   } else if (action === 'invoice') {
     openInvoicePage(order);
   } else if (action === 'show-products') {

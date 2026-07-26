@@ -334,7 +334,8 @@ nav a:hover {
 
   .cart-sidebar {
     width: 100%;
-    right: 0;
+    right: -100%;
+    left: 0;
   }
 
   .cart-sidebar.active {

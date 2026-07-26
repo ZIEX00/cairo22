@@ -544,7 +544,13 @@ header {
 
   .cart-sidebar {
     width: 100%;
-    right: 0;
+    right: -100%;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    border-radius: 0;
+    padding: 20px 16px;
+    max-width: none;
   }
 
   .cart-sidebar.active {
