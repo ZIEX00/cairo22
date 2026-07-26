@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>الفاتورة | Cairo22</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f8f4eb; padding: 24px; }
+    .invoice { max-width: 780px; margin: 0 auto; background: #fff; padding: 28px; border-radius: 20px; box-shadow: 0 12px 32px rgba(0,0,0,0.08); border: 1px solid #efe1c7; }
+    .toolbar { display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 12px; }
+    .toolbar button { padding: 8px 12px; border: none; border-radius: 10px; cursor: pointer; background: #c88b39; color: #fff; }
+    .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 2px solid #c88b39; margin-bottom: 18px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand img { width: 70px; height: 70px; border-radius: 16px; object-fit: cover; }
+    .brand h2 { margin: 0; color: #8f5f15; }
+    .brand p { margin: 2px 0 0; color: #7a6b58; font-size: 13px; }
+    .invoice-meta { text-align: left; min-width: 220px; }
+    .invoice-meta p { margin: 4px 0; color: #444; }
+    .section-title { font-weight: bold; color: #8f5f15; margin: 16px 0 8px; }
+    .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0e5d1; gap: 12px; }
+    .row strong { text-align: left; max-width: 60%; }
+    .total-box { background: #fffaf3; border: 1px solid #f1dcc0; border-radius: 12px; padding: 12px; margin-top: 12px; }
+    .footer-note { margin-top: 18px; color: #7a6b58; font-size: 13px; }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .toolbar { display: none; }
+      .invoice { box-shadow: none; border: 1px solid #ddd; border-radius: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button onclick="window.print()">طباعة</button>
+    <button onclick="downloadPdf()">تحميل PDF</button>
+  </div>
+  <div class="invoice">
+    <div class="header">
+      <div class="brand">
+        <img src="logo/logo.jpeg" alt="شعار الشركة" />
+        <div>
+          <h2>Cairo22</h2>
+          <p>متجر متخصص في ادوات التجميل</p>
+        </div>
+      </div>
+      <div class="invoice-meta">
+        <p><strong>رقم الفاتورة:</strong> <span id="invoiceNumber">—</span></p>
+        <p><strong>التاريخ:</strong> <span id="invoiceDate">—</span></p>
+        <p><strong>الحالة:</strong> <span id="statusLabel">—</span></p>
+      </div>
+    </div>
+
+    <div class="section-title">بيانات العميل</div>
+    <div class="row"><span>الاسم</span><strong id="name"></strong></div>
+    <div class="row"><span>الهاتف</span><strong id="phone"></strong></div>
+    <div class="row"><span>البريد</span><strong id="email"></strong></div>
+    <div class="row"><span>العنوان</span><strong id="address"></strong></div>
+
+    <div class="section-title">تفاصيل الطلب</div>
+    <div class="row"><span>المرجع</span><strong id="orderRef"></strong></div>
+    <div class="row"><span>المنتجات</span><strong id="items"></strong></div>
+
+    <div class="total-box">
+      <div class="row"><span>الإجمالي</span><strong id="total"></strong></div>
+    </div>
+
+    <p class="footer-note">شكراً لثقتكم في Cairo22، نقدر لكم دعمكم ونحرص على تقديم خدمة ممتازة.</p>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const now = new Date();
+    document.getElementById('orderRef').textContent = params.get('orderRef') || '—';
+    document.getElementById('name').textContent = params.get('name') || '—';
+    document.getElementById('phone').textContent = params.get('phone') || '—';
+    document.getElementById('email').textContent = params.get('email') || '—';
+    document.getElementById('address').textContent = params.get('address') || '—';
+    document.getElementById('statusLabel').textContent = params.get('status') || 'جديد';
+    document.getElementById('total').textContent = params.get('total') || '0';
+    document.getElementById('items').textContent = params.get('items') || '—';
+    document.getElementById('invoiceNumber').textContent = params.get('orderRef') || `INV-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+    document.getElementById('invoiceDate').textContent = now.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    window.downloadPdf = function downloadPdf() {
+      const printWindow = window.open('', '_blank', 'width=900,height=700');
+      if (!printWindow) {
+        alert('يرجى السماح بالنوافذ المنبثقة لطباعة أو تحميل PDF.');
+        return;
+      }
+      printWindow.document.write(document.documentElement.outerHTML);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    };
+  </script>
+</body>
+</html>
