@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تتبع الطلب | Cairo22</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f8f4eb; padding: 24px; }
+    .card { max-width: 700px; margin: 0 auto; background: #fff; padding: 24px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+    .status { display: inline-block; background: #c88b39; color: #fff; padding: 6px 12px; border-radius: 999px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>تتبع الطلب</h1>
+    <p><strong>مرجع الطلب:</strong> <span id="orderRef"></span></p>
+    <p><strong>الاسم:</strong> <span id="name"></span></p>
+    <p><strong>الهاتف:</strong> <span id="phone"></span></p>
+    <p><strong>الحالة:</strong> <span id="status" class="status"></span></p>
+    <p><strong>الإجمالي:</strong> <span id="total"></span></p>
+    <p><strong>العنوان:</strong> <span id="address"></span></p>
+    <p><strong>المنتجات:</strong> <span id="items"></span></p>
+    <hr />
+    <input id="trackInput" placeholder="أدخل رقم الهاتف أو مرجع الطلب" style="width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;" />
+    <button onclick="lookUpOrder()" style="margin-top:10px;padding:10px 14px;border:none;border-radius:10px;background:#c88b39;color:#fff;cursor:pointer;">بحث</button>
+    <p id="lookupMessage" style="margin-top:10px;color:#c62828;"></p>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const fillData = (order) => {
+      document.getElementById('orderRef').textContent = order.orderRef || '—';
+      document.getElementById('name').textContent = order.name || '—';
+      document.getElementById('phone').textContent = order.phone || '—';
+      document.getElementById('status').textContent = order.status || 'جديد';
+      document.getElementById('total').textContent = order.finalTotal || '0';
+      document.getElementById('address').textContent = order.address || '—';
+      document.getElementById('items').textContent = (order.items || []).map(item => `${item.name} × ${item.qty}`).join(' | ') || '—';
+    };
+
+    const initial = {
+      orderRef: params.get('orderRef') || '—',
+      name: params.get('name') || '—',
+      phone: params.get('phone') || '—',
+      status: params.get('status') || 'جديد',
+      finalTotal: params.get('total') || '0',
+      address: params.get('address') || '—',
+      items: []
+    };
+
+    fillData(initial);
+
+    window.lookUpOrder = function lookUpOrder() {
+      const value = document.getElementById('trackInput').value.trim();
+      const orders = JSON.parse(localStorage.getItem('cairo22_orders') || '[]');
+      const found = orders.find(order => (order.phone && order.phone.includes(value)) || (order.orderRef && order.orderRef.toUpperCase() === value.toUpperCase()));
+      const message = document.getElementById('lookupMessage');
+      if (!found) {
+        message.textContent = 'لم يتم العثور على طلب بهذا الرقم أو المرجع.';
+        return;
+      }
+      fillData(found);
+      message.textContent = 'تم العثور على الطلب.';
+    };
+  </script>
+</body>
+</html>
