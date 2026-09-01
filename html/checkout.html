@@ -8,23 +8,166 @@
   <link rel="shortcut icon" href="../../logo/logo.jpeg" type="image/x-icon" />
 </head>
 <body>
-  <div class="box">
-    <h2>🧾 إتمام الطلب</h2>
-    <input type="text" id="name" placeholder="الاسم" />
-    <input type="text" id="phone" placeholder="رقم الموبايل" />
-    <input type="email" id="email" placeholder="البريد الإلكتروني (اختياري)" />
-    <input type="text" id="address" placeholder="العنوان" />
-    <input type="text" id="orderRef" placeholder="مرجع الطلب (اختياري)" />
+  <div class="checkout-shell">
+    <div class="checkout-card">
+      <div class="checkout-header">
+        <div>
+          <p class="eyebrow">Cairo22</p>
+          <h2>إتمام الطلب</h2>
+        </div>
+        <a class="back-link" href="../../index.html">العودة للمتجر</a>
+      </div>
 
-    <div class="summary">
-      <h3>ملخص الطلب</h3>
-      <div id="orderItems"></div>
-      <hr />
-      <p id="totals"></p>
+      <div class="checkout-grid">
+        <section class="section-panel">
+          <h3>معلومات العميل</h3>
+          <div class="field-row">
+            <label>
+              الاسم الكامل
+              <input type="text" id="name" placeholder="اكتب اسمك بالكامل" />
+            </label>
+            <label>
+              رقم الهاتف
+              <input type="tel" id="phone" placeholder="05XXXXXXXX" />
+            </label>
+          </div>
+
+          <div class="field-row">
+            <label>
+              البريد الإلكتروني
+              <input type="email" id="email" placeholder="اختياري" />
+            </label>
+            <label>
+              المدينة / المنطقة
+              <input type="text" id="city" placeholder="مثل القاهرة / الاسكندرية" />
+            </label>
+          </div>
+
+          <label>
+            العنوان التفصيلي
+            <input type="text" id="address" placeholder="الشارع، الحي، تفاصيل التوصيل" />
+          </label>
+
+          <div class="field-row">
+            <label>
+              طريقة التوصيل
+              <select id="deliveryMethod">
+                <option value="standard">توصيل عادي - 50 EGP</option>
+                <option value="express">توصيل سريع - 100 EGP</option>
+                <option value="pickup">استلام من الفرع - مجاني</option>
+              </select>
+            </label>
+            <label>
+              طريقة الدفع
+              <select id="paymentMethod">
+                <option value="cash">الدفع عند الاستلام</option>
+                <option value="instapay">Instapay</option>
+                <option value="wallet">محفظة إلكترونية</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="payment-panel">
+            <h3>اختر طريقة الدفع</h3>
+            <div class="payment-options">
+              <label class="payment-option selected">
+                <input type="radio" name="paymentType" value="cash" checked />
+                <span>
+                  <strong>الدفع عند الاستلام</strong>
+                  <small>دفع أثناء التسليم أو الاستلام</small>
+                </span>
+              </label>
+
+              <label class="payment-option">
+                <input type="radio" name="paymentType" value="instapay" />
+                <span>
+                  <strong>Instapay</strong>
+                  <small>إرسال المبلغ مباشرة عبر رقم الهاتف</small>
+                </span>
+              </label>
+
+              <label class="payment-option">
+                <input type="radio" name="paymentType" value="wallet" />
+                <span>
+                  <strong>المحفظة الإلكترونية</strong>
+                  <small>Vodafone Cash / Etisalat Cash / Orange</small>
+                </span>
+              </label>
+            </div>
+
+            <div class="payment-flow">
+              <div class="stepper">
+                <span class="step active">1</span>
+                <span class="step">2</span>
+                <span class="step">3</span>
+              </div>
+              <div class="flow-copy">
+                <div class="flow-item"><strong>الخطوة 1:</strong> اختر طريقة الدفع المناسبة.</div>
+                <div class="flow-item"><strong>الخطوة 2:</strong> أرسل المبلغ على الرقم المختار.</div>
+                <div class="flow-item"><strong>الخطوة 3:</strong> اكتب رقم العملية أو تفاصيل الإيداع.</div>
+              </div>
+            </div>
+
+            <div id="walletFields" class="wallet-fields hidden">
+              <div class="field-row">
+                <label>
+                  نوع الدفع
+                  <select id="walletType">
+                    <option value="vodafone">Vodafone Cash</option>
+                    <option value="etisalat">Etisalat Cash</option>
+                    <option value="orange">Orange Cash</option>
+                    <option value="instapay">Instapay</option>
+                  </select>
+                </label>
+                <label>
+                  رقم الهاتف / المحفظة
+                  <input type="tel" id="paymentPhone" placeholder="مثال: 01012345678" />
+                </label>
+              </div>
+
+              <label>
+                رقم العملية / تفاصيل الإيداع
+                <input type="text" id="paymentReference" placeholder="مثال: رقم العملية 9987 أو تفاصيل الإيداع" />
+              </label>
+            </div>
+          </div>
+
+          <label>
+            ملاحظات الطلب
+            <textarea id="notes" rows="4" placeholder="أي ملاحظات خاصة بطلبك"></textarea>
+          </label>
+
+          <label>
+            مرجع الطلب (اختياري)
+            <input type="text" id="orderRef" placeholder="مثال: C22-123456" />
+          </label>
+        </section>
+
+        <aside class="summary-panel">
+          <h3>ملخص الطلب</h3>
+          <div id="orderItems" class="order-items"></div>
+
+          <div class="coupon-box">
+            <label class="coupon-label" for="couponCode">كود الخصم</label>
+            <div class="coupon-row">
+              <input id="couponCode" type="text" placeholder="أدخل الكود" />
+              <button id="applyCouponBtn" type="button">تطبيق</button>
+            </div>
+            <small id="couponMessage" class="coupon-message"></small>
+          </div>
+
+          <div class="totals">
+            <div class="line"><span>المجموع</span><strong id="subtotalValue">0 EGP</strong></div>
+            <div class="line"><span>الشحن</span><strong id="shippingValue">0 EGP</strong></div>
+            <div class="line"><span>خصم</span><strong id="discountValue">0 EGP</strong></div>
+            <div class="line total-row"><span>الإجمالي النهائي</span><strong id="finalTotalValue">0 EGP</strong></div>
+          </div>
+
+          <button id="submitOrderBtn" type="button">تأكيد الطلب</button>
+          <p id="orderStatus" class="order-status"></p>
+        </aside>
+      </div>
     </div>
-
-    <p id="orderStatus" style="color:#2e7d32;font-weight:700;margin-top:10px;"></p>
-    <button onclick="submitOrder()">تأكيد الطلب</button>
   </div>
 
   <script type="module" src="../js/checkout.js"></script>

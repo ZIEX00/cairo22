@@ -38,6 +38,26 @@ function showMessage(msg) {
   setTimeout(() => div.remove(), 3000);
 }
 
+function attachCardTilt() {
+  document.querySelectorAll('.card').forEach((card) => {
+    card.addEventListener('pointermove', (event) => {
+      const rect = card.getBoundingClientRect();
+      const px = (event.clientX - rect.left) / rect.width;
+      const py = (event.clientY - rect.top) / rect.height;
+      const rotateY = (px - 0.5) * 12;
+      const rotateX = (0.5 - py) * 12;
+
+      card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+      card.style.boxShadow = `${-rotateY * 2}px ${rotateX * 2}px 35px rgba(27, 20, 16, 0.16)`;
+    });
+
+    card.addEventListener('pointerleave', () => {
+      card.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0)';
+      card.style.boxShadow = '0 22px 45px rgba(27, 20, 16, 0.12)';
+    });
+  });
+}
+
 function renderProducts() {
   if (!list) return;
   list.innerHTML = '';
@@ -56,6 +76,8 @@ function renderProducts() {
     `;
     list.appendChild(card);
   });
+
+  attachCardTilt();
 }
 
 function viewProduct(index) {
@@ -190,6 +212,7 @@ function typeEffect() {
   if (!target) return;
   const text = 'اكتشف جمالك مع Cairo22';
   let index = 0;
+  target.textContent = '';
 
   const tick = () => {
     target.textContent += text[index];
