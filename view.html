@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="shortcut icon" href="/logo/logo.jpeg" type="image/x-icon">
+  <title>تفاصيل المنتج</title>
+  <link rel="stylesheet" href="/links/css/view.css">
+</head>
+<body>
+<header class="fade-in">
+  <h2 class="logo">Cairo22</h2>
+  <nav>
+    <a href="../../index.html">الرئيسية</a>
+    <a href="/links/html/products.html">المنتجات</a>
+    <a href="/links/html/contact.html">تواصل معنا</a>
+  </nav>
+  
+</header>
+<section>
+
+<div class="product-details fade-in" id="details"></div>
+</section>
+<div class="image-overlay" id="overlay">
+  <img id="overlayImg" src="" alt="تكبير الصورة">
+</div>
+<script>
+  // Fade-in on scroll
+const faders = document.querySelectorAll('.fade-in');
+
+const appearOptions = {
+  threshold: 0.2,
+  rootMargin: "0px 0px -50px 0px"
+};
+
+const appearOnScroll = new IntersectionObserver((entries, observer) => {
+  entries.forEach(entry => {
+    if(!entry.isIntersecting) return;
+    entry.target.classList.add('visible');
+    observer.unobserve(entry.target);
+  });
+}, appearOptions);
+
+faders.forEach(fader => {
+  appearOnScroll.observe(fader);
+});
+  const div = document.getElementById("details");
+const defaultProductImage = new URL('../../logo/logo.jpeg', window.location.href).toString();
+
+function getSafeProductImage(productItem) {
+  const value = (productItem?.img || '').toString().trim();
+  return value || defaultProductImage;
+}
+
+// جلب المنتج من localStorage
+const product = JSON.parse(localStorage.getItem("productDetails"));
+
+// عناصر التكبير
+const overlay = document.getElementById("overlay");
+const overlayImg = document.getElementById("overlayImg");
+
+if (!product) {
+  div.innerHTML = '<div class="card-detail"><div class="details-content"><h1>لم يتم العثور على المنتج</h1><p class="meta">يرجى العودة إلى قائمة المنتجات والمحاولة مرة أخرى.</p></div></div>';
+} else {
+  div.innerHTML = `
+    <div class="card-detail">
+      <img id="productImage" src="${getSafeProductImage(product)}" alt="${product.name}" onerror="this.onerror=null;this.src='${defaultProductImage}';">
+      <div class="details-content">
+        <span class="badge">${product.category || 'منتج'}</span>
+        <h1>${product.name}</h1>
+        <p class="price">${Number(product.price || 0).toLocaleString()} EGP</p>
+        <p class="meta">العلامة التجارية: ${product.brand || 'غير محددة'}</p>
+        <p class="meta">النوع: ${product.type || 'غير محدد'}</p>
+        <p class="meta">${product.description || 'لا يوجد وصف متاح لهذا المنتج في الوقت الحالي.'}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;">
+          <button class="btn-primary" onclick="addToCartFromDetails()">أضف للسلة</button>
+          <button class="btn-secondary" onclick="buyNowFromDetails()">اشتري الآن</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // تفعيل التكبير عند الضغط على الصورة
+  const productImage = document.getElementById("productImage");
+  productImage.addEventListener("click", () => {
+    overlay.style.display = "flex";
+    overlayImg.src = getSafeProductImage(product);
+  });
+
+  // إغلاق التكبير عند الضغط على الخلفية
+  overlay.addEventListener("click", () => {
+    overlay.style.display = "none";
+    overlayImg.src = "";
+  });
+}
+
+function addToCartFromDetails() {
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const existing = cart.find(item => item.name === product.name);
+
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({...product, qty:1});
+  }
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+  alert("تمت الإضافة للسلة ✅");
+}
+
+function buyNowFromDetails() {
+  localStorage.setItem("buyNow", JSON.stringify(product));
+  window.location.href = "checkout.html";
+}
+</script>
+<script src="../js/site-ui.js"></script>
+</body>
+</html>

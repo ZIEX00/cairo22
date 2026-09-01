@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>منتجات Cairo22</title>
+  <link rel="shortcut icon" href="../../logo/logo.jpeg" type="image/x-icon" />
+  <link rel="stylesheet" href="../css/products.css" />
+</head>
+<body>
+  <header class="fade-in">
+    <a class="logo" href="../../index.html">Cairo22</a>
+    <nav>
+      <a href="../../index.html">الرئيسية</a>
+      <a href="contact.html">تواصل معنا</a>
+    </nav>
+    <button class="cart-btn" onclick="toggleCart()">🛒 <span id="count">0</span></button>
+  </header>
+
+  <section class="filters fade-in">
+    <select onchange="filterCategory(this.value)">
+      <option value="all">كل المنتجات</option>
+      <option value="كريم">كريم</option>
+      <option value="مكنة حلاقه">مكنة حلاقة</option>
+      <option value="مكنة تنعيم">مكنة تنعيم</option>
+      <option value="مقصات">مقصات</option>
+      <option value="طقم مكنه">طقم مكنه</option>
+      <option value="مكوة شعر">مكوة شعر</option>
+    </select>
+
+    <select onchange="filterBrand(this.value)">
+      <option value="all">كل الماركات</option>
+      <option value="VGR">VGR</option>
+      <option value="VGR تنعيم">VGR تنعيم</option>
+      <option value="kemei">kemei</option>
+      <option value="dax">dax</option>
+      <option value="wax">wax</option>
+      <option value="lns">lns</option>
+      <option value="###">###</option>
+    </select>
+
+    <select onchange="filterType(this.value)">
+      <option value="all">كل الأنواع</option>
+      <option value="تدريج">تدريج</option>
+      <option value="زيرو">زيرو</option>
+    </select>
+
+    <input type="text" id="searchInput" placeholder="ابحث عن منتج..." onkeyup="searchProduct()" />
+    <input type="number" id="minPrice" placeholder="اقل سعر" />
+    <input type="number" id="maxPrice" placeholder="اعلى سعر" />
+    <button onclick="filterByPrice()">فلتر السعر</button>
+  </section>
+
+  <section class="products-page fade-in">
+    <div class="grid" id="productList"></div>
+  </section>
+
+  <div class="cart-sidebar fade-in" id="cartSidebar">
+    <div class="cart-header">
+      <h3>السلة</h3>
+      <span onclick="toggleCart()">✖</span>
+    </div>
+    <div id="cartItems"></div>
+    <div class="cart-footer">
+      <h4 id="total">Total: 0 EGP</h4>
+      <button class="checkout-btn" onclick="checkoutCart()">إتمام الشراء</button>
+    </div>
+  </div>
+
+  <script src="../js/products.js"></script>
+  <script src="../js/site-ui.js"></script>
+</body>
+</html>
